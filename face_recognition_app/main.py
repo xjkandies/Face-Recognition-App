@@ -25,8 +25,12 @@ class FaceRecognitionApp:
         # Configure custom styles
         style.configure('Success.TLabel', foreground=SUCCESS_COLOR, font=NORMAL_FONT)
         style.configure('Error.TLabel', foreground=ERROR_COLOR, font=NORMAL_FONT)
-        style.configure('Header.TLabel', font=HEADER_FONT)
-        style.configure('Custom.TButton', font=BUTTON_FONT)
+        style.configure('Header.TLabel', font=HEADER_FONT, foreground=PRIMARY_COLOR)
+        style.configure('Custom.TButton', 
+                       font=BUTTON_FONT, 
+                       background=PRIMARY_COLOR,
+                       foreground='white')
+        style.configure('Primary.TFrame', background=PRIMARY_COLOR)
 
         # Load authorized faces
         self.authorized_encodings = frm.load_authorized_faces()
@@ -56,25 +60,32 @@ class FaceRecognitionApp:
 
     def setup_ui(self):
         """Set up the user interface."""
-        # Main container
+        # Main container with primary color header
+        header_frame = ttk.Frame(self.root, style='Primary.TFrame')
+        header_frame.grid(row=0, column=0, sticky='ew')
+        self.root.grid_columnconfigure(0, weight=1)
+        
         main_frame = ttk.Frame(self.root, padding="20")
-        main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        main_frame.grid(row=1, column=0, sticky='nsew')
         
-        # Header
+        # Header with primary color background
         header_label = ttk.Label(
-            main_frame, 
+            header_frame, 
             text="Face Recognition Access Control",
-            style='Header.TLabel'
+            style='Header.TLabel',
+            padding="10"
         )
-        header_label.grid(row=0, column=0, columnspan=2, pady=(0, 20))
+        header_label.grid(row=0, column=0, pady=(10, 10))
+        header_frame.grid_columnconfigure(0, weight=1)
         
-        # Image preview frame
+        # Image preview frame with primary color border
         self.preview_frame = ttk.LabelFrame(
             main_frame,
             text="Image Preview",
-            padding="10"
+            padding="10",
+            style='Custom.TButton'
         )
-        self.preview_frame.grid(row=1, column=0, columnspan=2, pady=(0, 20), sticky='nsew')
+        self.preview_frame.grid(row=1, column=0, columnspan=2, pady=(20, 20), sticky='nsew')
         
         # Preview label
         self.preview_label = ttk.Label(self.preview_frame)
@@ -84,7 +95,7 @@ class FaceRecognitionApp:
         button_frame = ttk.Frame(main_frame)
         button_frame.grid(row=2, column=0, columnspan=2, pady=(0, 20))
         
-        # Upload button
+        # Upload button with primary color
         self.upload_btn = ttk.Button(
             button_frame,
             text="Upload Image",
@@ -93,7 +104,7 @@ class FaceRecognitionApp:
         )
         self.upload_btn.grid(row=0, column=0, padx=5)
         
-        # Verify button
+        # Verify button with primary color
         self.verify_btn = ttk.Button(
             button_frame,
             text="Verify Face",
@@ -103,7 +114,7 @@ class FaceRecognitionApp:
         )
         self.verify_btn.grid(row=0, column=1, padx=5)
         
-        # Clear button
+        # Clear button with primary color
         self.clear_btn = ttk.Button(
             button_frame,
             text="Clear",
@@ -121,13 +132,18 @@ class FaceRecognitionApp:
         )
         self.result_label.grid(row=3, column=0, columnspan=2, pady=(0, 20))
         
-        # Status label
+        # Status label with primary color
         self.status_label = ttk.Label(
             main_frame,
             text=f"Authorized faces loaded: {len(self.authorized_encodings)}",
-            font=NORMAL_FONT
+            font=NORMAL_FONT,
+            foreground=PRIMARY_COLOR
         )
         self.status_label.grid(row=4, column=0, columnspan=2)
+
+        # Configure grid weights
+        main_frame.grid_columnconfigure(0, weight=1)
+        main_frame.grid_columnconfigure(1, weight=1)
 
     def upload_image(self):
         """Handle image upload."""
