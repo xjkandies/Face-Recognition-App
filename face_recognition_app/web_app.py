@@ -5,7 +5,6 @@ from gtts import gTTS
 import base64
 import tempfile
 from werkzeug.utils import secure_filename
-import shutil
 
 app = Flask(__name__)
 
@@ -22,78 +21,6 @@ authorized_encodings = frm.load_authorized_faces()
 @app.route('/')
 def index():
     return render_template('index.html')
-
-@app.route('/test_authorized')
-def test_authorized():
-    """Test route for authorized face"""
-    try:
-        # Copy the authorized face to uploads
-        src = os.path.join('authorized_faces', 'sample_authorized.jpg')
-        dst = os.path.join(app.config['UPLOAD_FOLDER'], 'test_auth.jpg')
-        shutil.copy2(src, dst)
-        
-        # Verify the face
-        is_authorized, message = frm.verify_face(dst, authorized_encodings)
-        
-        # Generate speech
-        speech_file = tempfile.NamedTemporaryFile(suffix='.mp3', delete=False)
-        tts = gTTS(text="Access Granted" if is_authorized else "Access Denied", 
-                  lang='en', slow=False)
-        tts.save(speech_file.name)
-        
-        # Read the audio file and convert to base64
-        with open(speech_file.name, 'rb') as audio_file:
-            audio_data = base64.b64encode(audio_file.read()).decode('utf-8')
-        
-        # Clean up
-        os.unlink(speech_file.name)
-        os.unlink(dst)
-        
-        return jsonify({
-            'success': True,
-            'is_authorized': is_authorized,
-            'message': message,
-            'audio': audio_data
-        })
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/test_unauthorized')
-def test_unauthorized():
-    """Test route for unauthorized face"""
-    try:
-        # Copy the unauthorized face to uploads
-        src = 'test_image.jpg'  # This is Obama's photo
-        dst = os.path.join(app.config['UPLOAD_FOLDER'], 'test_unauth.jpg')
-        shutil.copy2(src, dst)
-        
-        # Verify the face
-        is_authorized, message = frm.verify_face(dst, authorized_encodings)
-        
-        # Generate speech
-        speech_file = tempfile.NamedTemporaryFile(suffix='.mp3', delete=False)
-        tts = gTTS(text="Access Granted" if is_authorized else "Access Denied", 
-                  lang='en', slow=False)
-        tts.save(speech_file.name)
-        
-        # Read the audio file and convert to base64
-        with open(speech_file.name, 'rb') as audio_file:
-            audio_data = base64.b64encode(audio_file.read()).decode('utf-8')
-        
-        # Clean up
-        os.unlink(speech_file.name)
-        os.unlink(dst)
-        
-        return jsonify({
-            'success': True,
-            'is_authorized': is_authorized,
-            'message': message,
-            'audio': audio_data
-        })
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 @app.route('/verify', methods=['POST'])
 def verify():
@@ -141,6 +68,29 @@ def verify():
             return jsonify({'error': str(e)}), 500
     
     return jsonify({'error': 'Invalid file'}), 400
+
+@app.route('/download_audio/<filename>')
+def download_audio(filename):
+    """Route to download generated audio files"""
+    try:
+        return send_file(
+            os.path.join(app.config['UPLOAD_FOLDER'], filename),
+            as_attachment=True,
+            download_name=filename
+        )
+    except Exception as e:
+        return jsonify({'error': str(e)}), 404
+
+@app.route('/preview/<filename>')
+def preview_image(filename):
+    """Route to preview uploaded images"""
+    try:
+        return send_file(
+            os.path.join(app.config['UPLOAD_FOLDER'], filename),
+            mimetype='image/jpeg'
+        )
+    except Exception as e:
+        return jsonify({'error': str(e)}), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)
