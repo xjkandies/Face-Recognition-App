@@ -1,109 +1,97 @@
 # Face Recognition Access Control System
 
-A desktop application that uses facial recognition to control access by comparing uploaded face images against a database of authorized faces.
-
-## Features
-
-- Modern and user-friendly desktop interface
-- Real-time face verification
-- Support for multiple authorized faces
-- Clear visual feedback for access decisions
-- Easy-to-use image upload system
+A web-based face recognition system with voice feedback that verifies faces against an authorized database.
 
 ## Prerequisites
 
-- Python 3.8 or higher
-- pip (Python package installer)
-- Operating system: Windows, macOS, or Linux
-- Webcam (optional, for live capture feature)
+Before running the system, make sure you have Python 3.10+ installed on your computer.
 
-## Installation
+## Installation Steps
 
-1. Clone or download this repository to your local machine.
-
-2. Create a virtual environment (recommended):
+1. First, navigate to the project directory:
 ```bash
-python -m venv venv
+cd face_recognition_app
 ```
 
-3. Activate the virtual environment:
-   - On Windows:
-   ```bash
-   venv\Scripts\activate
-   ```
-   - On macOS/Linux:
-   ```bash
-   source venv/bin/activate
-   ```
-
-4. Install the required packages:
+2. Install the required dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-Note: On some systems, you might need to install additional system-level dependencies for the face_recognition package. Please refer to the [face_recognition installation guide](https://github.com/ageitgey/face_recognition#installation) if you encounter any issues.
-
-## Setting Up Authorized Faces
-
-1. Create a folder named `authorized_faces` in the application directory (if it doesn't exist already).
-
-2. Add photos of authorized individuals to this folder:
-   - Use clear, well-lit photos
-   - Each photo should contain only one face
-   - Supported formats: JPG, JPEG, PNG
-   - Name the files descriptively (e.g., "john_doe.jpg")
-
-## Usage
-
-1. Run the application:
+3. Create necessary directories:
 ```bash
-python main.py
+mkdir -p uploads authorized_faces
 ```
 
-2. Using the application:
-   - Click "Upload Image" to select a photo for verification
-   - The selected image will appear in the preview window
-   - Click "Verify Face" to check if the face matches any authorized faces
-   - The result will be displayed below the buttons
-   - Use "Clear" to reset and try another image
+4. Add at least one authorized face:
+   - Place a photo of an authorized person in the `authorized_faces` directory
+   - Name it something like `authorized1.jpg`
+   - Supported formats: JPG, JPEG, PNG
+
+## Running the Application
+
+1. Start the web application:
+```bash
+python3 web_app.py
+```
+
+2. Open your web browser and go to:
+```
+http://localhost:8000
+```
+
+## Using the System
+
+The web interface offers three ways to test face recognition:
+
+1. **Quick Test Buttons:**
+   - Click "Test Authorized Face" to verify an authorized face
+   - Click "Test Unauthorized Face" to test with an unauthorized face
+
+2. **Upload Your Own Image:**
+   - Drag and drop an image onto the upload area
+   - Or click the upload area to select a file
+   - Click "Verify Face" to check the image
+
+3. **Results:**
+   - The system will display "Access Granted" or "Access Denied"
+   - A female voice will announce the result
+   - Visual feedback shows green for granted access and red for denied access
 
 ## Troubleshooting
 
-Common issues and solutions:
+1. If you get a "port already in use" error:
+   - Kill the existing process: `pkill -f "python3 web_app.py"`
+   - Try running the application again
 
-1. **No face detected**
-   - Ensure the image is clear and well-lit
-   - Make sure the face is clearly visible and not obscured
-   - Try a different photo angle
+2. If dependencies fail to install:
+   - Try installing them one by one from requirements.txt
+   - Make sure you have Python development headers installed:
+     ```bash
+     # On Ubuntu/Debian:
+     sudo apt-get install python3-dev
+     
+     # On CentOS/RHEL:
+     sudo yum install python3-devel
+     ```
 
-2. **Multiple faces detected**
-   - Use a photo containing only one face
-   - Crop the image to include only the face to be verified
+3. If face recognition is not working:
+   - Make sure the image is clear and well-lit
+   - Verify that the face is clearly visible in the image
+   - Check that the authorized_faces directory contains at least one reference image
 
-3. **Access denied for authorized person**
-   - Check if the person's photo is in the authorized_faces folder
-   - Try using a clearer or more recent photo
-   - Ensure proper lighting in both the authorized and verification photos
+## System Requirements
 
-## Security Notes
+- Python 3.10 or higher
+- Modern web browser (Chrome, Firefox, Safari, Edge)
+- Microphone enabled for voice feedback
+- Webcam (optional, for live capture)
 
-- Keep the authorized_faces folder secure and regularly backed up
-- Regularly update the authorized faces database
-- Monitor and audit access attempts if needed
-- Consider implementing additional security measures for sensitive applications
+## Features
 
-## Technical Details
-
-The application uses:
-- face_recognition library for face detection and recognition
-- Tkinter for the graphical user interface
-- PIL (Python Imaging Library) for image handling
-- Custom face encoding storage system
-
-## Contributing
-
-Feel free to submit issues, fork the repository, and create pull requests for any improvements.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+- Face Recognition with dlib
+- Female voice feedback using Google Text-to-Speech
+- Modern UI with Tailwind CSS
+- Drag-and-drop file upload
+- Real-time visual feedback
+- Support for multiple image formats
